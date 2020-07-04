@@ -6,6 +6,7 @@
 
 #include "../CellSkyline/DataSet.h"
 #include "../CellSkyline/DataSet3.h"
+#include "../CellSkyline/shrink_parallel.cuh"
 
 using namespace std;
 
@@ -59,5 +60,7 @@ int main()
 	auto skyline_1 =  ds3_1.skyline_serial();
 	print_skyline(skyline);
 	print_skyline(skyline_1);
+
+	shrink_parallel();
 }
 

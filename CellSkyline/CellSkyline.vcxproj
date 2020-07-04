@@ -79,12 +79,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="shrink_parallel.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataPoint.h" />
     <ClInclude Include="DataSet.h" />
     <ClInclude Include="DataSet3.h" />
     <ClInclude Include="KeyCell.h" />
+    <ClInclude Include="shrink_parallel.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataPoint.cpp" />

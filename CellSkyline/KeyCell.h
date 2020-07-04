@@ -74,7 +74,7 @@ public:
 		{
 			if (i1.indices[i] < i2.indices[i])
 				return true;
-			else if (i1.indices[i] > i2.indices[i])
+			if (i1.indices[i] > i2.indices[i])
 				return false;
 		}
 		return false;
