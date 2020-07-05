@@ -7,14 +7,14 @@
 
 class DataSet3
 {public:
-	const static int kDataPointNum = 5;
+	int kDataPointNum;
 	std::shared_ptr<std::vector<DataPoint3>> data_points;
 
 	const static int kWidth = 32768;// 2^15
 
 	const static int kMaxLayer = 5;
 
-	DataSet3();
+	DataSet3(int num = 5);
 	void skyline_points(std::vector<DataPoint3>& points, std::vector<DataPoint3>& result) const;
 	std::vector<DataPoint3> skyline_serial();
 

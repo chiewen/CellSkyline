@@ -2,7 +2,7 @@
 
 using namespace std;
 
-DataSet3::DataSet3(): data_points(new vector<DataPoint3>()),
+DataSet3::DataSet3(int num):kDataPointNum(num), data_points(new vector<DataPoint3>()),
 pt1(new char[2][2][2]()),
 pt2(new char[4][4][4]()),
 pt3(new char[8][8][8]()),

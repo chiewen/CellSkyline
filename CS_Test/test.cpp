@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "../CellSkyline/DataSet.h"
 #include "../CellSkyline/KeyCell.h"
+#include <iostream>
+#include "../CellSkyline/DataSet3.h"
 
 TEST(SkylineSerial, DataSet) {
 	DataSet ds;
