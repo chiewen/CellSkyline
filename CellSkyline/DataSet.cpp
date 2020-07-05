@@ -7,11 +7,10 @@
 
 using namespace std;
 
-const int DataSet::kDataPointNum;
 const int DataSet::kWidth;
 const int DataSet::kMaxLayer;
 
-DataSet::DataSet()
+DataSet::DataSet(int num): kDataPointNum(num)
 {
 	init_data_points();
 }

@@ -12,9 +12,9 @@
 using namespace std::chrono;
 using namespace std;
 
-void skyline_2D()
+void skyline_2D(int i)
 {
-	DataSet ds;
+	DataSet ds(i);
 	DataSet ds1 (ds);
 
 	std::vector<DataPoint> skyline;
@@ -53,8 +53,17 @@ void print_skyline(vector<DataPointD<3>>& skyline)
 
 int main()
 {
-	// skyline_2D();
 	vector<int> times{ 5, 50, 500, 5000, 50000, 500000 };
+
+	for (auto t : times) {
+		auto start = system_clock::now();
+		 skyline_2D(t);
+		auto end = system_clock::now();
+		auto duration = duration_cast<microseconds>(end - start);
+		cout << "处理" << t << "个2D点花费了"
+			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+			<< "秒" << endl;
+	}	
 
 	for (auto t : times) {
 		auto start = system_clock::now();
@@ -67,7 +76,7 @@ int main()
 		print_skyline(skyline_1);
 		auto end = system_clock::now();
 		auto duration = duration_cast<microseconds>(end - start);
-		cout << "处理" << t << "个点花费了"
+		cout << "处理" << t << "个3D点花费了"
 			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
 			<< "秒" << endl;
 	}	

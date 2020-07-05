@@ -36,6 +36,7 @@ void initialData(float* ip, int size) {
 	// generate different seed for random number
 	time_t t;
 	srand((unsigned)time(&t));
+	int iii = 3;
 	for (int i = 0; i < size; i++) {
 		ip[i] = (float)(rand() & 0xFF) / 10.0f;
 	}

@@ -8,13 +8,13 @@
 class DataSet
 {
 public:
-	const static int kDataPointNum = 5000;
+	int kDataPointNum;
 	std::vector<DataPoint> data_points;
 
 	const static int kWidth = 32768;// 2^15
 	const static int kMaxLayer = 6;
 
-	DataSet();
+	DataSet(int num = 50);
 	void skyline_points(std::vector<DataPoint>& points, std::vector<DataPoint>& result) const;
 	std::vector<DataPoint> skyline_serial();
 
