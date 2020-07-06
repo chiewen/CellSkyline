@@ -80,5 +80,7 @@ int main()
 			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
 			<< "秒" << endl;
 	}	
+
+	shrink_parallel();
 }
 
