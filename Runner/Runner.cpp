@@ -80,6 +80,6 @@ int main()
 			<< "秒" << endl;
 	}	
 
-	shrink_parallel();
+	// shrink_parallel();
 }
 

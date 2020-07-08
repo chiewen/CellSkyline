@@ -197,6 +197,28 @@ vector<DataPoint> DataSet::skyline_serial()
 	return skyline;
 }
 
+std::vector<DataPoint> DataSet::skyline_parallel() {
+	vector<DataPoint> skyline;
+
+	sort_data_points(kMaxLayer);
+
+	prepare_cells();
+	
+	vector<KeyCell<2>> kc_0{ {0,0} }, kc_1, kc_2, kc_3, kc_4, kc_5, kc_6;
+
+	shrink_candidates_serial(kc_0, kc_1, 2, t1);
+	shrink_candidates_serial(kc_1, kc_2, 4, t2);
+	shrink_candidates_serial(kc_2, kc_3, 8, t3);
+	shrink_candidates_serial(kc_3, kc_4, 16, t4);
+	shrink_candidates_serial(kc_4, kc_5, 32, t5);
+	shrink_candidates_serial(kc_5, kc_6, 64, t6);
+
+	refine(kc_6, skyline, 64, p6);
+
+	return skyline;
+
+}
+
 void DataSet::skyline_points(vector<DataPoint>& points, vector<DataPoint>& result) const
 {
 	sort(points.begin(), points.end(), [](const DataPoint& p1, const DataPoint& p2)-> bool

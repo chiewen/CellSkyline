@@ -54,15 +54,14 @@ __global__ void sumArraysOnGPU(float* A, float* B, float* C) {
 	C[i] = A[i] + B[i];
 }
 
-int shrink_parallel2(DataSet& ds) {
-	printf("%s Starting...\n", "hello");
-	// set up device
+template<class T>
+int shrink_parallel2(const std::vector<KeyCell<2>>& kc_a, std::vector<KeyCell<2>>& kc_b, int ce_max, T& t) {
+
+	// std::vector<>
 	int dev = 0;
 	cudaSetDevice(dev);
 	// set up data size of vectors
 	int nElem = 32;
-	printf("Vector size %d\n", nElem);
-	// malloc host memory
 	size_t nBytes = nElem * sizeof(float);
 	float *h_A, *h_B, *hostRef, *gpuRef;
 	h_A = (float*)malloc(nBytes);

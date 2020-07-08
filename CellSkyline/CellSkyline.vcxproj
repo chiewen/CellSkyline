@@ -82,6 +82,7 @@
     <CudaCompile Include="shrink_parallel.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cell.h" />
     <ClInclude Include="DataPoint.h" />
     <ClInclude Include="DataSet.h" />
     <ClInclude Include="DataSet3.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="shrink_parallel.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="DataPoint.cpp" />
     <ClCompile Include="DataSet.cpp" />
     <ClCompile Include="DataSet3.cpp" />
