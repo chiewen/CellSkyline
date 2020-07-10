@@ -17,15 +17,16 @@ class DataSet3
 	DataSet3(int num = 5);
 	void skyline_points(std::vector<DataPoint3>& points, std::vector<DataPoint3>& result) const;
 	std::vector<DataPoint3> skyline_serial();
+	std::vector<DataPoint3> skyline_parallel();
 
 private:
-	std::shared_ptr<char[2][2][2]> pt1;
-	std::shared_ptr<char[4][4][4]> pt2;
-	std::shared_ptr<char[8][8][8]> pt3;
-	std::shared_ptr<char[16][16][16]> pt4;
-	std::shared_ptr<char[32][32][32]> pt5;
-	std::shared_ptr<char[64][64][64]> pt6;
-	std::shared_ptr<char[128][128][128]> pt7;
+	std::shared_ptr<bool[2][2][2]> pt1;
+	std::shared_ptr<bool[4][4][4]> pt2;
+	std::shared_ptr<bool[8][8][8]> pt3;
+	std::shared_ptr<bool[16][16][16]> pt4;
+	std::shared_ptr<bool[32][32][32]> pt5;
+	std::shared_ptr<bool[64][64][64]> pt6;
+	std::shared_ptr<bool[128][128][128]> pt7;
 
 	std::shared_ptr<int[128][128][128][2]> pp;
 
@@ -52,7 +53,7 @@ void DataSet3::fill_empty_cells(T1& t1, T2& t2, int max)
 		{
 			for (int k = 0; k < max; ++k)
 			{
-				if (t1[i][j][k] > 0) t2[i / 2][j / 2][k / 2] = 1;
+				if (t1[i][j][k]) t2[i / 2][j / 2][k / 2] = true;
 			}
 		}
 	}
@@ -63,7 +64,7 @@ void DataSet3::shrink_candidates_serial(const std::vector<KeyCell<3>>& kc_a, std
 {
 	const int Dimension = 3;
 	Iterator<2> iter{ 0, 0 };
-	int cs = kc_a[0].get_x();
+	int cs = kc_a[0].get_last();
 	int ce = ce_max;
 
 	std::map<Iterator<2>, int> m_cs;
@@ -121,7 +122,7 @@ void DataSet3::shrink_candidates_serial(const std::vector<KeyCell<3>>& kc_a, std
 			}	
 			iter.advance(ce_max);
 		}
-		cs = key_cell.get_x() * 2;
+		cs = key_cell.get_last() * 2;
 		m_cs.insert(std::make_pair(iter, cs));
 	}
 	for (unsigned short i = iter[0]; i < ce_max; ++i)

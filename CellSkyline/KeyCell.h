@@ -15,7 +15,7 @@ public:
 	KeyCell(std::initializer_list<unsigned short int> il);
 
 	Iterator<D-1> get_I() const;
-	unsigned short int get_x() const;
+	unsigned short int get_last() const;
 
 	unsigned short int& operator[](int i) { return indices[i]; }
 	
@@ -41,10 +41,15 @@ public:
 template <int D>
 KeyCell<D>::KeyCell(std::initializer_list<unsigned short int> il) 
 {
-	int i = 0;
-	for (auto elem : il)
-	{
-		indices[i++] = elem;
+	if (il.size() > 0) {
+		int i = 0;
+		for (auto elem : il)
+		{
+			indices[i++] = elem;
+		}
+	}
+	else {
+		memset(indices, 0, sizeof(unsigned short) * D);
 	}
 }
 
@@ -55,13 +60,13 @@ Iterator<D-1> KeyCell<D>::get_I() const
 }
 
 template <int D>
-unsigned short KeyCell<D>::get_x() const
+unsigned short KeyCell<D>::get_last() const
 {
 	return indices[D - 1];
 }
 
 template<int E>
-class Iterator : public  KeyCell<E>
+class Iterator : public KeyCell<E>
 {
 public:
 	Iterator(std::initializer_list<unsigned short int> il);
@@ -80,12 +85,10 @@ public:
 		return false;
 	}
 
-private:
-	int max_;
 };
 
 template <int E>
-Iterator<E>::Iterator(std::initializer_list<unsigned short int> il) : KeyCell(il), max_(64)
+Iterator<E>::Iterator(std::initializer_list<unsigned short int> il) : KeyCell(il)
 {
 }
 

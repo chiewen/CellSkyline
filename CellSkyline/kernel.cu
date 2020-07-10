@@ -24,14 +24,12 @@ __global__ void helloFromGPU()
 	printf("hello from GPU\n");
 }
 
-int main()
+int cudamain()
 {
 	cudaDeviceProp cdp0, cdp1;
 	cudaGetDeviceProperties(&cdp0, 0);
-	cudaGetDeviceProperties(&cdp1, 1);
 
 	std::cout << cdp0.name << std::endl;
-	std::cout << cdp1.name << std::endl;
 
     const int arraySize = 6;
     const int a[arraySize] = { 1, 2, 3, 4, 5, 6 };
@@ -41,7 +39,7 @@ int main()
     // Add vectors in parallel.
     cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize);
 
-	helloFromGPU <<<1, 10 >>> ();
+	// helloFromGPU <<<1, 10 >>> ();
 
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "addWithCuda failed!");

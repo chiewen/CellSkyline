@@ -8,6 +8,7 @@ class Cell
 public:
 	unsigned short int indices[D];
 	Cell(std::initializer_list<unsigned short int> il);
+	bool isEmpty = true;
 
 	unsigned short int& operator[](int i) { return indices[i]; }
 	

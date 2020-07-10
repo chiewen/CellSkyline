@@ -59,7 +59,7 @@ void DataSet::fill_empty_cells(T1& t1, T2& t2, int max)
 	{
 		for (int j = 0; j < max; ++j)
 		{
-			if (t1[i][j] > 0) t2[i / 2][j / 2] = 1;
+			if (t1[i][j]) t2[i / 2][j / 2] = true;
 		}
 	}
 }
@@ -93,7 +93,7 @@ template<class T>
 void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<KeyCell<2>>& kc_b, int ce_max, T& t)
 {
 	Iterator<1> iter{ 0 };
-	int cs = kc_a[0].get_x();
+	int cs = kc_a[0].get_last();
 	int ce = ce_max;
 	
 	for (unsigned short k = 1; k < kc_a.size(); k++)
@@ -104,7 +104,7 @@ void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<Ke
 		{
 			for (unsigned short j = cs; j < ce; ++j)
 			{
-				if (t[i][j] != 0)
+				if (t[i][j])
 				{
 					kc_b.push_back(KeyCell<2>{ i, j });
 					ce = j;
@@ -113,13 +113,13 @@ void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<Ke
 			}	
 		}
 		iter = iter_next;
-		cs = key_cell.get_x() * 2;
+		cs = key_cell.get_last() * 2;
 	}
 	for (unsigned short i = iter[0] * 2; i < ce_max; ++i)
 	{
 		for (unsigned short j = cs; j < ce; ++j)
 		{
-			if (t[i][j] != 0)
+			if (t[i][j])
 			{
 				kc_b.push_back(KeyCell<2>{ i, j });
 				ce = j;
@@ -134,7 +134,7 @@ template <class T>
 void DataSet::refine(vector<KeyCell<2>>& kc, vector<DataPoint>& skyline, int ce_max, T& t)
 {
 	Iterator<1> iter{ 0 };
-	int cs = kc[0].get_x();
+	int cs = kc[0].get_last();
 	int ce = ce_max;
 	
 	for (unsigned short k = 1; k < kc.size(); k++)
@@ -159,7 +159,7 @@ void DataSet::refine(vector<KeyCell<2>>& kc, vector<DataPoint>& skyline, int ce_
 		}
 		iter = iter_next;
 		ce = cs;
-		cs = key_cell.get_x();
+		cs = key_cell.get_last();
 
 		skyline_points(points, skyline);
 	}

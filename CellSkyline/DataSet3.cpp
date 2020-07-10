@@ -1,15 +1,16 @@
 #include "DataSet3.h"
+#include "shrink_parallel.cuh"
 
 using namespace std;
 
 DataSet3::DataSet3(int num):kDataPointNum(num), data_points(new vector<DataPoint3>()),
-pt1(new char[2][2][2]()),
-pt2(new char[4][4][4]()),
-pt3(new char[8][8][8]()),
-pt4(new char[16][16][16]()),
-pt5(new char[32][32][32]()),
-pt6(new char[64][64][64]()),
-pt7(new char[128][128][128]()),
+pt1(new bool[2][2][2]()),
+pt2(new bool[4][4][4]()),
+pt3(new bool[8][8][8]()),
+pt4(new bool[16][16][16]()),
+pt5(new bool[32][32][32]()),
+pt6(new bool[64][64][64]()),
+pt7(new bool[128][128][128]()),
 pp(new int[128][128][128][2]())
 {
 	init_data_points();
@@ -34,6 +35,29 @@ void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<Da
 		}
 	});
 	result.insert(result.end(), skyline.begin(), skyline.end());
+}
+
+std::vector<DataPoint3> DataSet3::skyline_parallel()
+{
+	vector<DataPoint3> skyline;
+
+	sort_data_points(kMaxLayer);
+
+	prepare_cells();
+	
+	vector<KeyCell<3>> kc_0{ {0,0,0} }, kc_1, kc_2, kc_3, kc_4, kc_5, kc_6, kc_7;
+
+	shrink_parallel3(kc_0, kc_1, 2, pt1);
+	// shrink_parallel3(kc_1, kc_2, 4, pt2);
+	// shrink_parallel3(kc_2, kc_3, 8, pt3);
+	// shrink_parallel3(kc_3, kc_4, 16, pt4);
+	// shrink_parallel3(kc_4, kc_5, 32, pt5);
+	// shrink_parallel3(kc_5, kc_6, 64, pt6);
+	// shrink_parallel3(kc_6, kc_7, 128, pt7);
+	//
+	// refine(kc_7, skyline, 128, pp);
+
+	return skyline;
 }
 
 std::vector<DataPoint3> DataSet3::skyline_serial()

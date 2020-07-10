@@ -11,7 +11,7 @@ TEST(SkylineSerial, DataSet) {
 	KeyCell<3> kc2{ 1, 2, 3 };
 	KeyCell<3> kc3{ 4, 2, 3 };
 
-	std::cout << kc.get_I() << " : " << kc.get_x() << std::endl;
+	std::cout << kc.get_I() << " : " << kc.get_last() << std::endl;
 
 	EXPECT_EQ(ds.data_points.size(), ds.kDataPointNum + 2);
 	EXPECT_EQ(kc, kc2);
@@ -25,7 +25,7 @@ TEST(SkylineSerial, DataPoint) {
 TEST(SkylineSerial, DataSet3) {
 	KeyCell<5> kc{ 1, 63, 63, 63, 63 };
 	auto i = kc.get_I();
-	EXPECT_EQ(kc.get_x(), 63);
+	EXPECT_EQ(kc.get_last(), 63);
 	i.advance(64);
 	auto in = Iterator<4>{ 2, 0, 0, 0 };
 	EXPECT_EQ(i, in);
