@@ -1,72 +1,35 @@
 #include "ParallelShrinker.h"
 
-
-int ParallelShrinker::process3(std::vector<Cell<3>>& cells, std::vector<KeyCell<3>>& key_cells) const {
-
-	// const int l = log2(cells.size());
- //
-	// const auto dev = 0;
-	// cudaSetDevice(dev);
- //
-	// const int cell_num = cells.size();
-	// const auto n_bytes = l * cell_num * sizeof(Cell<3>);
-	// Cell<3>* h_bo = static_cast<Cell<3>*>(malloc(n_bytes));
-	// Cell<3>* h_bl = static_cast<Cell<3>*>(malloc(n_bytes));
- //
-	// for (int i = 0; i < cells.size(); ++i)
-	// {
-	// 	h_bo[i] = cells[i];
-	// }
- //
-	// Cell<3> *d_bo, *d_bl;
-	// cudaMalloc(static_cast<Cell<3>**>(&d_bo), n_bytes);
-	// cudaMalloc(static_cast<Cell<3>**>(&d_bl), n_bytes);
-	// cudaMemcpy(d_bo, h_bo, n_bytes, cudaMemcpyHostToDevice);
-	// cudaMemcpy(d_bl, h_bl, n_bytes, cudaMemcpyHostToDevice);
- //
-	// dim3 block(32 > cell_num ? cell_num : 32);
-	// dim3 grid((cell_num + block.x - 1)/ block.x);
- //
-	// for (int i = 1; i <= l; ++i) {
-	// 	std::cout << "pow result:" << pow(2, l - i) << std::endl;
- //
-	// 	// ProcessBo <<<grid, block>>>(int(pow(2, l - i)), d_bo + (i - 1) * cell_num, d_bo + i * cell_num);
-	// 	cudaDeviceSynchronize();
-	// }
-	// for (int i = l; i >= 0; i--) {
-	// 	std::cout << "pow result bl:" << pow(2, l - i) << std::endl;
-	// 	// ProcessBl<<<grid, block>>>(pow(2, l - i), d_bl + i * cell_num, d_bl + (i + 1) * cell_num, d_bo + i * cell_num);
-	// 	cudaDeviceSynchronize();
-	// }
-	// // sumArraysOnGPU <<< grid, block >>>(d_Bo, d_Bl);
-	// printf("Execution configuration <<<%d, %d>>>\n", grid.x, block.x);
-	// // cudaMemcpy(gpu_ref, d_c, n_bytes, cudaMemcpyDeviceToHost);
-	// cudaFree(d_bo);
-	// cudaFree(d_bl);
-	// free(h_bo);
-	// free(h_bl);
-	// std::cout << "this is parallel" << std::endl;
- //
- //    cudaDeviceReset();
- //
-	// thrust::host_vector<int> H(4);
- //
-	// // initialize individual elements
-	// H[0] = 14;
-	// H[1] = 20;
-	// H[2] = 38;
-	// H[3] = 46;
- //
-	// thrust::device_vector<int> D = H;
-	//
-	// int sum = thrust::reduce(D.begin(), D.end(), (int)0, thrust::plus<int>());
-	//
-	// std::cout << "sum:" << sum << std::endl;
-	//
-	// std::cout << D.size() << ", " << D[0] << std::endl;
-	// thrust::copy(D.begin(), D.end(), std::ostream_iterator<int>(std::cout, "\n"));
-
-	return 0;
-
-}
+// template<int D>
+// struct CellComparer
+// {
+// 	__host__ __device__
+// 	Cell<D> operator()(Cell<D>& ca, Cell<D>& cb) {
+// 		for (int i = 2; i < D; ++i) {
+// 			if (ca.indices[i] != cb.indices[i]) return cb;
+// 		}
+// 		if (ca.indices[0] <= cb.indices[0] && ca.indices[1] <= cb.indices[1] && ca.isFilled)
+// 			return ca;
+// 		return cb;
+// 	}
+//
+// };
+//
+// int ParallelShrinker::process2(std::vector<Cell<2>>& cells, std::vector<Cell<2>>& key_cells) const {
+// 	thrust::device_vector<Cell<2>> d_cells(cells);
+// 	thrust::inclusive_scan(d_cells.begin(), d_cells.end(), CellComparer<3>());
+// 	key_cells.clear();
+// 	key_cells.resize(d_cells.size());
+// 	thrust::copy(d_cells.begin(), d_cells.end(), key_cells.begin());
+// 	return 0;
+// }
+//
+// int ParallelShrinker::process3(std::vector<Cell<3>>& cells, std::vector<KeyCell<3>>& key_cells) const {
+// 	thrust::device_vector<Cell<3>> d_cells(cells);
+// 	thrust::inclusive_scan(d_cells.begin(), d_cells.end(), CellComparer<3>());
+//
+//
+// 	return 0;
+//
+// }
 

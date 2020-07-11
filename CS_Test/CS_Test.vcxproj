@@ -28,7 +28,9 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.1.props" />
+  </ImportGroup>
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
@@ -59,6 +61,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.1.targets" />
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

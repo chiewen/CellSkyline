@@ -16,6 +16,7 @@
 #include "DataSet3.h"
 #include "DataSet.h"
 #include "Cell.h"
+#include "ParallelShrink.cuh"
 #define CHECK(call) \
 { \
 const cudaError_t error = call; \
@@ -106,7 +107,7 @@ void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& k
 			for (unsigned short j = cs; j < ce; ++j)
 			{
 				Cell<D> cell{ iterator[0], iterator[1], j };
-				cell.isEmpty = t[iterator[0]][iterator[1]][j];
+				cell.isFilled = t[iterator[0]][iterator[1]][j];
 
 				kc_b.emplace_back(cell);
 				if (t[iterator[0]][iterator[1]][j])
@@ -133,7 +134,7 @@ void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& k
 			for (unsigned short k = cs; k < ce; ++k)
 			{
 				Cell<D> cell{i, j, k};
-				cell.isEmpty = t[i][j][k];
+				cell.isFilled = t[i][j][k];
 
 				kc_b.emplace_back(cell);
 				if (t[i][j][k])

@@ -2,7 +2,11 @@
 #include "../CellSkyline/DataSet.h"
 #include "../CellSkyline/KeyCell.h"
 #include <iostream>
+
+#include "../CellSkyline/Cell.h"
 #include "../CellSkyline/DataSet3.h"
+// #include "../CellSkyline/ParallelShrink.cuh"
+// #include "../CellSkyline/ParallelShrinker.h"
 
 TEST(SkylineSerial, DataSet) {
 	DataSet ds;
@@ -57,3 +61,13 @@ TEST(SkylineSerial, Utils)
 	EXPECT_EQ(aa->second, 28);
 	EXPECT_EQ(bb, m_cs.end());
 }
+
+// TEST(SkylineParallel, Utils)
+// {
+// 	std::vector<Cell<2>> cells{ {false, 0, 2}, {true, 0, 3}, {false, 0, 4}, {true, 0, 5}, {true, 0, 6}, {true, 0, 7}, {false, 1, 2}, {false, 1, 3}, {false, 1, 4}, {false, 1, 5}, {false, 1, 6}, {false, 1, 7}, {true, 2, 2}, {true, 2, 3}, {true, 3, 2}, {false, 3, 3} };
+//
+// 	std::vector<Cell<2>> cells2;
+// 	// ParallelShrinker ps;
+// 	// ps.process2(cells, cells2);
+// 	// std::copy(cells2.begin(), cells2.end(), std::ostream_iterator<Cell<2>>(std::cout, " "));
+// }
