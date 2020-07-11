@@ -87,6 +87,7 @@
     <ClInclude Include="DataSet.h" />
     <ClInclude Include="DataSet3.h" />
     <ClInclude Include="KeyCell.h" />
+    <ClInclude Include="ParallelShrinker.h" />
     <ClInclude Include="shrink_parallel.cuh" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +96,7 @@
     <ClCompile Include="DataSet.cpp" />
     <ClCompile Include="DataSet3.cpp" />
     <ClCompile Include="KeyCell.cpp" />
+    <ClCompile Include="ParallelShrinker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,6 +8,15 @@
 #include "../CellSkyline/shrink_parallel.cuh"
 #include <chrono>  
 
+#include <thrust/version.h>
+#include <thrust/device_vector.h>
+#include <thrust/transform.h>
+#include <thrust/sequence.h>
+#include <thrust/copy.h>
+#include <thrust/fill.h>
+#include <thrust/replace.h>
+#include <thrust/functional.h>
+
 using namespace std::chrono;
 using namespace std;
 
@@ -52,33 +61,34 @@ void print_skyline(vector<DataPointD<3>>& skyline)
 
 int main()
 {
-	vector<int> times{ 5, 50, 500, 5000, 50000};
+	vector<int> times{ 5};
+	// vector<int> times{ 5, 50, 500, 5000, 50000};
 
-	for (auto t : times) {
-		auto start = system_clock::now();
-		 skyline_2D(t);
-		auto end = system_clock::now();
-		auto duration = duration_cast<microseconds>(end - start);
-		cout << "处理" << t << "个2D点花费了"
-			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
-			<< "秒" << endl;
-	}	
-
-	for (auto t : times) {
-		auto start = system_clock::now();
-		DataSet3 ds3(t);
-		DataSet3 ds3_1 = ds3;
-		vector<DataPoint3> skyline;
-		ds3.skyline_points(*ds3.data_points, skyline);
-		auto skyline_1 = ds3_1.skyline_serial();
-		print_skyline(skyline);
-		print_skyline(skyline_1);
-		auto end = system_clock::now();
-		auto duration = duration_cast<microseconds>(end - start);
-		cout << "处理" << t << "个3D点花费了"
-			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
-			<< "秒" << endl;
-	}	
+	// for (auto t : times) {
+	// 	auto start = system_clock::now();
+	// 	 skyline_2D(t);
+	// 	auto end = system_clock::now();
+	// 	auto duration = duration_cast<microseconds>(end - start);
+	// 	cout << "处理" << t << "个2D点花费了"
+	// 		<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+	// 		<< "秒" << endl;
+	// }	
+	//
+	// for (auto t : times) {
+	// 	auto start = system_clock::now();
+	// 	DataSet3 ds3(t);
+	// 	DataSet3 ds3_1 = ds3;
+	// 	vector<DataPoint3> skyline;
+	// 	ds3.skyline_points(*ds3.data_points, skyline);
+	// 	auto skyline_1 = ds3_1.skyline_serial();
+	// 	print_skyline(skyline);
+	// 	print_skyline(skyline_1);
+	// 	auto end = system_clock::now();
+	// 	auto duration = duration_cast<microseconds>(end - start);
+	// 	cout << "处理" << t << "个3D点花费了"
+	// 		<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+	// 		<< "秒" << endl;
+	// }	
 
 	for (auto t : times) {
 		auto start = system_clock::now();
@@ -95,7 +105,6 @@ int main()
 			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
 			<< "秒" << endl;
 	}	
-
 	// shrink_parallel();
 }
 

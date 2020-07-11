@@ -1,3 +1,6 @@
+//Deprecated
+
+//all functions are moved to parallalShrinker
 #pragma once
 #include "DataSet3.h"
 #include "DataSet.h"
@@ -23,10 +26,28 @@ printf("code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
 exit(1); \
 } \
 }
+
+template <int D, int S>
+class CompCell
+{
+public:
+	__host__ __device__
+	bool operator() (Cell<D> &ca, Cell<D> &cb) {
+		for (int i = S; i < D; ++i) {
+			if (ca[i] < cb[i]) return true;
+			if (ca[i] > cb[i]) return false;
+		}
+		for (int i = 0; i < S; ++i) {
+			if (ca[i] < cb[i]) return true;
+			if (ca[i] > cb[i]) return false;
+		}
+		return false;
+	}
+};
+
 int shrink_parallel(DataSet3& ds);
 
 int process3(std::vector<Cell<3>>& cells, std::vector<KeyCell<3>> &key_cells);
-int cudamain();
 
 // template<class T, int D>
 // int shrink_parallel3(const std::vector<KeyCell<D>>& kc_a, std::vector<KeyCell<D>>& kc_b, int ce_max, T& t) ;
@@ -35,28 +56,28 @@ template <class T, int D>
 void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& kc_b, int ce_max, T& t)
 {
 	const int Dimension = D;
-	Iterator<D - 1> iter{};
+	Iterator<D - 1> iterator{};
 	int cs = kc_a[0].get_last() * 2;
 	int ce = ce_max;
 
 	std::map<Iterator<D-1>, int> m_cs;
 	std::map<Iterator<D-1>, int> m_ce;
-	m_cs.insert(std::make_pair(iter, cs));
-	m_ce.insert(std::make_pair(iter, ce));
+	m_cs.insert(std::make_pair(iterator, cs));
+	m_ce.insert(std::make_pair(iterator, ce));
 	
 	for (int k = 1; k < kc_a.size(); k++)
 	{
 		auto& key_cell = kc_a[k];
 		auto iter_next = key_cell.get_I().next_layer();
 		
-		while (iter != iter_next)
+		while (iterator != iter_next)
 		{
-			auto fs = m_cs.find(iter);
+			auto fs = m_cs.find(iterator);
 			if (fs == m_cs.end())
 			{
 				for (int i = 0; i < Dimension - 1; ++i)
 				{
-					auto iter2 = iter;
+					auto iter2 = iterator;
 					iter2[i]--;
 					auto f = m_cs.find(iter2);
 					if (f != m_cs.end() && f->second > cs)
@@ -64,7 +85,7 @@ void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& k
 						cs = f->second;
 					}
 				}
-				m_cs.insert(std::make_pair(iter, cs));
+				m_cs.insert(std::make_pair(iterator, cs));
 			}
 			else
 			{
@@ -74,7 +95,7 @@ void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& k
 			ce = ce_max;
 			for (int i = 0; i < Dimension - 1; ++i)
 			{
-				auto iter2 = iter;
+				auto iter2 = iterator;
 				iter2[i]--;
 				auto f = m_ce.find(iter2);
 				if (f != m_ce.end() && f->second < ce)
@@ -84,30 +105,30 @@ void prepare_cells3(const std::vector<KeyCell<D>>& kc_a, std::vector<Cell<D>>& k
 			}
 			for (unsigned short j = cs; j < ce; ++j)
 			{
-				Cell<D> cell{ iter[0], iter[1], j };
-				cell.isEmpty = t[iter[0]][iter[1]][j];
+				Cell<D> cell{ iterator[0], iterator[1], j };
+				cell.isEmpty = t[iterator[0]][iterator[1]][j];
 
 				kc_b.emplace_back(cell);
-				if (t[iter[0]][iter[1]][j])
+				if (t[iterator[0]][iterator[1]][j])
 				{
-					auto fe = m_ce.find(iter);
+					auto fe = m_ce.find(iterator);
 					if (fe != m_ce.end()) {
 						fe->second = j;
 					}
 					else {
 						ce = j + j;
-						m_ce.insert(std::make_pair(iter, ce));
+						m_ce.insert(std::make_pair(iterator, ce));
 					}
 				}
 			}	
-			iter.advance(ce_max);
+			iterator.advance(ce_max);
 		}
 		cs = key_cell.get_last() * 2;
-		m_cs.insert(std::make_pair(iter, cs));
+		m_cs.insert(std::make_pair(iterator, cs));
 	}
-	for (unsigned short i = iter[0]; i < ce_max; ++i)
+	for (unsigned short i = iterator[0]; i < ce_max; ++i)
 	{
-		for (unsigned short j = iter[1]; j < ce_max; ++j)
+		for (unsigned short j = iterator[1]; j < ce_max; ++j)
 		{
 			for (unsigned short k = cs; k < ce; ++k)
 			{
@@ -134,8 +155,8 @@ int shrink_parallel3(const std::vector<KeyCell<D>>& kc_a, std::vector<KeyCell<D>
 	std::cout << "cells:" << cells.size() << std::endl;
 
 	
-	KeyCell<D> key_cells;
+	std::vector<KeyCell<3>> key_cells{};
 	process3(cells, key_cells);
-	cudamain();
+	process3(cells, key_cells);
 	return (0);
 }
