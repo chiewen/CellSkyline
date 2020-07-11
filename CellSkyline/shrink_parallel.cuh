@@ -25,7 +25,7 @@ exit(1); \
 }
 int shrink_parallel(DataSet3& ds);
 
-int process();
+int process3(std::vector<Cell<3>>& cells, std::vector<KeyCell<3>> &key_cells);
 int cudamain();
 
 // template<class T, int D>
@@ -131,9 +131,11 @@ int shrink_parallel3(const std::vector<KeyCell<D>>& kc_a, std::vector<KeyCell<D>
 	std::vector<Cell<D>> cells;
 	prepare_cells3(kc_a, cells, ce_max, t);
 
-	std::cout << "cells:" << cells.size() << std::endl;;
+	std::cout << "cells:" << cells.size() << std::endl;
 
-	process();
+	
+	KeyCell<D> key_cells;
+	process3(cells, key_cells);
 	cudamain();
 	return (0);
 }

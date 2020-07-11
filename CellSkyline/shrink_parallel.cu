@@ -40,46 +40,44 @@ __global__ void sumArraysOnGPU(float* A, float* B, float* C) {
 	C[i] = A[i] + B[i];
 }
 
-int process() {
+int process3(std::vector<Cell<3>> &cells, std::vector<KeyCell<3>> &key_cells) {
+	
+	int l = log2(cells.size());
+
 	int dev = 0;
 	cudaSetDevice(dev);
-	// set up data size of vectors
-	int nElem = 32;
-	size_t nBytes = nElem * sizeof(float);
-	float *h_A, *h_B, *hostRef, *gpuRef;
-	h_A = (float*)malloc(nBytes);
-	h_B = (float*)malloc(nBytes);
-	hostRef = (float*)malloc(nBytes);
-	gpuRef = (float*)malloc(nBytes);
 
-	// initialize data at host side
-	// initialData(h_A, nElem);
-	// initialData(h_B, nElem);
-	memset(hostRef, 0, nBytes);
-	memset(gpuRef, 0, nBytes);
-	// malloc device global memory
-	float *d_A, *d_B, *d_C;
-	cudaMalloc((float**)&d_A, nBytes);
-	cudaMalloc((float**)&d_B, nBytes);
-	cudaMalloc((float**)&d_C, nBytes);
-	// transfer data from host to device
-	cudaMemcpy(d_A, h_A, nBytes, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_B, h_B, nBytes, cudaMemcpyHostToDevice);
+	int cell_num = cells.size();
+	size_t nBytes = l * cell_num * sizeof(Cell<3>);
+	Cell<3> *h_Bo, *h_Bl, *hostRef, *gpuRef;
+	h_Bo = (Cell<3>*)malloc(nBytes);
+	h_Bl = (Cell<3>*)malloc(nBytes);
+
+	for (int i = 0; i < cells.size(); ++i)
+	{
+		h_Bo[i] = cells[i];
+	}
+
+	Cell<3> *d_Bo, *d_Bl, *d_C;
+	cudaMalloc((Cell<3>**)&d_Bo, nBytes);
+	cudaMalloc((Cell<3>**)&d_Bl, nBytes);
+	cudaMemcpy(d_Bo, h_Bo, nBytes, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_Bl, h_Bl, nBytes, cudaMemcpyHostToDevice);
 	// invoke kernel at host side
-	dim3 block(nElem);
-	dim3 grid(nElem / block.x);
-	sumArraysOnGPU <<< grid, block >>>(d_A, d_B, d_C);
+	dim3 block(32);
+	dim3 grid(cell_num / block.x);
+	sumArraysOnGPU <<< grid, block >>>(d_Bo, d_Bl);
 	cudaDeviceSynchronize();
 	printf("Execution configuration <<<%d, %d>>>\n", grid.x, block.x);
 	// copy kernel result back to host side
 	cudaMemcpy(gpuRef, d_C, nBytes, cudaMemcpyDeviceToHost);
 	// add vector at host side for result checks
-	cudaFree(d_A);
-	cudaFree(d_B);
+	cudaFree(d_Bo);
+	cudaFree(d_Bl);
 	cudaFree(d_C);
 	// free host memory
-	free(h_A);
-	free(h_B);
+	free(h_Bo);
+	free(h_Bl);
 	free(hostRef);
 	free(gpuRef);
 	std::cout << "this is parallel" << std::endl;
