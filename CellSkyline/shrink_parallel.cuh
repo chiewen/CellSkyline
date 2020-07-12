@@ -4,7 +4,6 @@
 #pragma once
 #include "DataSet3.h"
 #include "DataSet.h"
-#include "Cell.h"
 
 #include <cuda_runtime.h>
 #include <stdio.h>
@@ -13,9 +12,10 @@
 #include <device_launch_parameters.h>
 #include <cstring>
 #include <iostream>
+
+#include "Cell.cuh"
 #include "DataSet3.h"
 #include "DataSet.h"
-#include "Cell.h"
 #include "ParallelShrink.cuh"
 #define CHECK(call) \
 { \
