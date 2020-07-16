@@ -19,10 +19,10 @@
 
 void checkResult(float* hostRef, float* gpuRef, const int N) {
 	double epsilon = 1.0E-8;
-	bool match = 1;
+	bool match = true;
 	for (int i = 0; i < N; i++) {
 		if (abs(hostRef[i] - gpuRef[i]) > epsilon) {
-			match = 0;
+			match = false;
 			printf("Arrays do not match!\n");
 			printf("host %5.2f gpu %5.2f at current %d\n", hostRef[i], gpuRef[i], i);
 			break;
@@ -31,8 +31,8 @@ void checkResult(float* hostRef, float* gpuRef, const int N) {
 	if (match) printf("Arrays match.\n\n");
 }
 
-template<int D>
-__device__ Cell<D> Comp(Cell<D> &ca, Cell<D> &cb) {
+template <int D>
+__device__ Cell<D> Comp(Cell<D>& ca, Cell<D>& cb) {
 	for (int i = 2; i < D; ++i) {
 		if (ca.indices[i] != cb.indices[i]) return cb;
 	}
@@ -41,15 +41,15 @@ __device__ Cell<D> Comp(Cell<D> &ca, Cell<D> &cb) {
 	return cb;
 }
 
-template<int D>
-__global__ void ProcessBo(int j_max, Cell<D> *bo_low, Cell<D> *bo_high) {
+template <int D>
+__global__ void ProcessBo(int j_max, Cell<D>* bo_low, Cell<D>* bo_high) {
 	const int j = threadIdx.x;
 	if (j <= j_max)
 		bo_high[j] = Comp(bo_low[2 * j], bo_low[2 * j + 1]);
 }
 
-template<int D>
-__global__ void ProcessBl(int j_max, Cell<D> *bl_low, Cell<D> *bl_high, Cell<D> *bo) {
+template <int D>
+__global__ void ProcessBl(int j_max, Cell<D>* bl_low, Cell<D>* bl_high, Cell<D>* bo) {
 	const int j = threadIdx.x;
 	if (j <= j_max) {
 		if (j == 0) {
@@ -60,42 +60,39 @@ __global__ void ProcessBl(int j_max, Cell<D> *bl_low, Cell<D> *bl_high, Cell<D> 
 			bl_low[j] = bl_high[(j - 1) / 2];
 			return;
 		}
-		else {
-			bl_low[j] = Comp(bl_high[j / 2 - 1], bo[j]);
-		}
+		bl_low[j] = Comp(bl_high[j / 2 - 1], bo[j]);
 	}
 }
 
 
-int process3(std::vector<Cell<3>> &cells, std::vector<KeyCell<3>> &key_cells) {
+int process3(std::vector<Cell<3>>& cells, std::vector<KeyCell<3>>& key_cells) {
 
 	const int l = log2(cells.size());
- 
+
 	const auto dev = 0;
 	cudaSetDevice(dev);
- 
+
 	const int cell_num = cells.size();
 	const auto n_bytes = l * cell_num * sizeof(Cell<3>);
 	Cell<3>* h_bo = static_cast<Cell<3>*>(malloc(n_bytes));
 	Cell<3>* h_bl = static_cast<Cell<3>*>(malloc(n_bytes));
- 
-	for (int i = 0; i < cells.size(); ++i)
-	{
+
+	for (int i = 0; i < cells.size(); ++i) {
 		h_bo[i] = cells[i];
 	}
- 
+
 	Cell<3> *d_bo, *d_bl;
 	cudaMalloc(static_cast<Cell<3>**>(&d_bo), n_bytes);
 	cudaMalloc(static_cast<Cell<3>**>(&d_bl), n_bytes);
 	cudaMemcpy(d_bo, h_bo, n_bytes, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_bl, h_bl, n_bytes, cudaMemcpyHostToDevice);
- 
+
 	dim3 block(32 > cell_num ? cell_num : 32);
-	dim3 grid((cell_num + block.x - 1)/ block.x);
- 
+	dim3 grid((cell_num + block.x - 1) / block.x);
+
 	for (int i = 1; i <= l; ++i) {
 		std::cout << "pow result:" << pow(2, l - i) << std::endl;
- 
+
 		ProcessBo <<<grid, block>>>(int(pow(2, l - i)), d_bo + (i - 1) * cell_num, d_bo + i * cell_num);
 		cudaDeviceSynchronize();
 	}
@@ -112,8 +109,8 @@ int process3(std::vector<Cell<3>> &cells, std::vector<KeyCell<3>> &key_cells) {
 	free(h_bo);
 	free(h_bl);
 	std::cout << "this is parallel" << std::endl;
- 
-    cudaDeviceReset();
+
+	cudaDeviceReset();
 
 	thrust::host_vector<int> H(4);
 
@@ -124,11 +121,11 @@ int process3(std::vector<Cell<3>> &cells, std::vector<KeyCell<3>> &key_cells) {
 	H[3] = 46;
 
 	thrust::device_vector<int> D = H;
-	
-	int sum = thrust::reduce(D.begin(), D.end(), (int)0, thrust::plus<int>());
-	
+
+	int sum = reduce(D.begin(), D.end(), (int)0, thrust::plus<int>());
+
 	std::cout << "sum:" << sum << std::endl;
-	
+
 	std::cout << D.size() << ", " << D[0] << std::endl;
 	thrust::copy(D.begin(), D.end(), std::ostream_iterator<int>(std::cout, "\n"));
 
