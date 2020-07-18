@@ -5,7 +5,8 @@
 #include "KeyCell.h"
 
 
-class DataSet {
+class DataSet
+{
 public:
 	int kDataPointNum;
 	std::vector<DataPoint> data_points;
@@ -39,5 +40,4 @@ private:
 
 	template <class T>
 	void refine(std::vector<KeyCell<2>>& kc, std::vector<DataPoint>& skyline, int ce_max, T& t);
-
 };

@@ -1,20 +1,23 @@
 ﻿#pragma once
 #include <ostream>
 
-class DataPoint {
+class DataPoint
+{
 public:
 	int x;
 	int y;
 
 	DataPoint(int x, int y);
 
-	friend std::ostream& operator<<(std::ostream& os, const DataPoint& p) {
+	friend std::ostream& operator<<(std::ostream& os, const DataPoint& p)
+	{
 		return os << "<" << p.x << "," << p.y << ">";
 	}
 };
 
 template <int D>
-class DataPointD {
+class DataPointD
+{
 public:
 	short indices[D];
 
@@ -23,9 +26,11 @@ public:
 
 	DataPointD(std::initializer_list<short> il);
 
-	friend std::ostream& operator<<(std::ostream& os, const DataPointD& p) {
+	friend std::ostream& operator<<(std::ostream& os, const DataPointD& p)
+	{
 		os << "<";
-		for (auto& index : p.indices) {
+		for (auto& index : p.indices)
+		{
 			os << index << ",";
 		}
 		os << ">";
@@ -34,7 +39,8 @@ public:
 };
 
 template <int D>
-DataPointD<D>::DataPointD(std::initializer_list<short> il) {
+DataPointD<D>::DataPointD(std::initializer_list<short> il)
+{
 	std::copy(il.begin(), il.end(), std::begin(indices));
 }
 

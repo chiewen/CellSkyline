@@ -11,11 +11,13 @@ DataSet3::DataSet3(int num): kDataPointNum(num), data_points(new vector<DataPoin
                              pt5(new bool[32][32][32]()),
                              pt6(new bool[64][64][64]()),
                              pt7(new bool[128][128][128]()),
-                             pp(new int[128][128][128][2]()) {
+                             pp(new int[128][128][128][2]())
+{
 	init_data_points();
 }
 
-void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<DataPointD<3>>& result) const {
+void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<DataPointD<3>>& result) const
+{
 	sort(points.begin(), points.end(), [](const DataPoint3& p1, const DataPoint3& p2)-> bool
 	{
 		return p1[0] + p1[1] + p1[2] < p2[0] + p2[1] + p2[2];
@@ -27,36 +29,28 @@ void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<Da
 		if (!count_if(skyline.begin(), skyline.end(), [&point](DataPoint3& p_s) -> bool
 		{
 			return p_s[0] <= point[0] && p_s[1] <= point[1] && p_s[2] <= point[2];
-		})) {
+		}))
+		{
 			skyline.push_back(point);
 		}
 	});
 	result.insert(result.end(), skyline.begin(), skyline.end());
 }
 
-std::vector<DataPoint3> DataSet3::skyline_parallel() {
+std::vector<DataPoint3> DataSet3::skyline_parallel()
+{
 	vector<DataPoint3> skyline;
-
-	sort_data_points(kMaxLayer);
-
-	prepare_cells();
-
-	vector<KeyCell<3>> kc_0{{0, 0, 0}}, kc_1, kc_2, kc_3, kc_4, kc_5, kc_6, kc_7;
-
-	shrink_parallel3(kc_0, kc_1, 2, pt1);
-	// shrink_parallel3(kc_1, kc_2, 4, pt2);
-	// shrink_parallel3(kc_2, kc_3, 8, pt3);
-	// shrink_parallel3(kc_3, kc_4, 16, pt4);
-	// shrink_parallel3(kc_4, kc_5, 32, pt5);
-	// shrink_parallel3(kc_5, kc_6, 64, pt6);
-	// shrink_parallel3(kc_6, kc_7, 128, pt7);
 	//
-	// refine(kc_7, skyline, 128, pp);
+	ParallelShrinker ps;
+	auto cells = ps.shrink_parallel3(*this);
+
+	refine_cell(cells, skyline, 128, pp);
 
 	return skyline;
 }
 
-std::vector<DataPoint3> DataSet3::skyline_serial() {
+std::vector<DataPoint3> DataSet3::skyline_serial()
+{
 	vector<DataPoint3> skyline;
 
 	sort_data_points(kMaxLayer);
@@ -78,7 +72,8 @@ std::vector<DataPoint3> DataSet3::skyline_serial() {
 	return skyline;
 }
 
-void DataSet3::init_data_points() const {
+void DataSet3::init_data_points() const
+{
 	data_points->reserve(kDataPointNum);
 	std::generate_n(back_inserter(*data_points), kDataPointNum, []()-> DataPoint3
 	{
@@ -102,14 +97,17 @@ void DataSet3::init_data_points() const {
 	fill_n(pp[0][0][0], 1 << 22, 0);
 }
 
-void DataSet3::prepare_cells() {
+void DataSet3::prepare_cells()
+{
 	const auto width = kWidth >> kMaxLayer;
 
 	// layer 6 and points 6
 	int i = 0;
-	for (auto& p : *data_points) {
+	for (auto& p : *data_points)
+	{
 		pt7[p[0] / width][p[1] / width][p[2] / width] = true;
-		if (pp[p[0] / width][p[1] / width][2] == nullptr) {
+		if (pp[p[0] / width][p[1] / width][2] == nullptr)
+		{
 			pp[p[0] / width][p[1] / width][p[2] / width][0] = i;
 		}
 		pp[p[0] / width][p[1] / width][p[2] / width][1] = i + 1;
@@ -125,7 +123,8 @@ void DataSet3::prepare_cells() {
 	fill_empty_cells(pt2, pt1, 4);
 }
 
-void DataSet3::sort_data_points(const int layer) {
+void DataSet3::sort_data_points(const int layer)
+{
 	const auto width = kWidth >> layer;
 
 	sort(data_points->begin(), data_points->end(), [=](const DataPoint3& p1, const DataPoint3& p2)-> bool

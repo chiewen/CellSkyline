@@ -12,50 +12,64 @@
 #include <thrust/device_vector.h>
 
 template <int D>
-class Cell {
+class Cell
+{
 public:
-	unsigned short int indices[D];
+	int indices[D];
 
 	__host__ __device__
 	Cell();
-	Cell(std::initializer_list<unsigned short int> il);
-	Cell(std::initializer_list<unsigned short int> il, bool isf);
-	bool isFilled = true;
+	Cell(std::initializer_list<int> il);
+	Cell( std::initializer_list<int> il, bool isf);
+	bool isFilled = false;
 
-	unsigned short int& operator[](int i) { return indices[i]; }
+	__host__ __device__
+	int& operator[](int i) { return indices[i]; }
 
-	friend std::ostream& operator<<(std::ostream& os, const Cell& p) {
+	friend std::ostream& operator<<(std::ostream& os, const Cell& p)
+	{
 		os << "[" << p.isFilled << ": ";
-		std::copy(std::begin(p.indices), std::end(p.indices), std::ostream_iterator<unsigned short int>(os, " "));
+		std::copy(std::begin(p.indices), std::end(p.indices), std::ostream_iterator<int>(os, " "));
 		os << "]";
 		return os;
 	}
 
-	friend bool operator==(const Cell& kc1, const Cell& kc2) {
-		return std::equal(std::begin(kc1.indices), std::end(kc1.indices), std::begin(kc2.indices));
+	__host__ __device__
+
+	friend bool operator==(const Cell& kc1, const Cell& kc2)
+	{
+		return thrust::equal(std::begin(kc1.indices), std::end(kc1.indices), std::begin(kc2.indices));
 	}
 
-	friend bool operator!=(const Cell& kc1, const Cell& kc2) {
+	__host__ __device__
+
+	friend bool operator!=(const Cell& kc1, const Cell& kc2)
+	{
 		return !(kc1 == kc2);
 	}
 };
 
 template <int D>
-Cell<D>::Cell() {
-	for (int i = 0; i < D; ++i) {
+Cell<D>::Cell()
+{
+	for (int i = 0; i < D; ++i)
+	{
 		indices[i] = -1;
 	}
 }
 
 template <int D>
-Cell<D>::Cell(std::initializer_list<unsigned short int> il) {
+Cell<D>::Cell(std::initializer_list<int> il)
+{
 	int i = 0;
-	for (auto elem : il) {
+	for (auto elem : il)
+	{
 		indices[i++] = elem;
 	}
 }
 
 template <int D>
-Cell<D>::Cell(std::initializer_list<unsigned short> il, bool isf) : Cell(il) {
+Cell<D>::Cell( std::initializer_list<int> il, bool isf) : Cell(il)
+{
 	this->isFilled = isf;
 }

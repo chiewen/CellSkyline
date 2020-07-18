@@ -13,100 +13,166 @@
 
 #include "Cell.cuh"
 
-
 template <int D>
-using t_pair = thrust::pair<Cell<D>, Cell<D>>;
+struct CellNode
+{
+	Cell<D> original;
+	Cell<D> previous_dominater;
+	Cell<D> dominater;
 
-//
-// template <int D>
-// struct CellComparerOriginal {
-// 	__host__ __device__
-//
-// 	Cell<D> operator()(Cell<D>& ca, Cell<D>& cb) {
-// 		for (int i = 2; i < D; ++i) {
-// 			if (ca.indices[i] != cb.indices[i]) return cb;
-// 		}
-// 		if (ca.indices[0] <= cb.indices[0] && ca.indices[1] <= cb.indices[1] && ca.isFilled)
-// 			return ca;
-// 		return cb;
-// 	}
-// };
-
-// template<int D>
-// struct CellPairMaker {
-// 	__host__ __device__
-// 	t_pair<D> operator()(Cell<D> &cell) {
-// 		return thrust::make_pair(cell, cell);
-// 	}
-// };
-//
-// template <int D>
-// struct CandidateCellComparer {
-// 	__host__ __device__
-//
-// 	Cell<D> operator()(Cell<D>& ca, Cell<D>& cb) {
-// 		for (int i = 2; i < D; ++i) {
-// 			if (ca.indices[i] != cb.indices[i]) return cb;
-// 		}
-// 		if (ca.indices[0] < cb.indices[0] && ca.indices[1] < cb.indices[1] && ca.isFilled) {
-// 			cb.isDominated = true;
-// 			return ca;
-// 		}
-// 		if (ca.indices[0] <= cb.indices[0] && ca.indices[1] <= cb.indices[1] && ca.isFilled)
-// 			return ca;
-// 		return cb;
-// 	}
-// };
-
-template <int D>
-struct CellComparer {
 	__host__ __device__
 
-	t_pair<D> operator()(t_pair<D>& ca, t_pair<D>& cb) {
-		for (int i = 2; i < D; ++i) {
-			if (ca.second.indices[i] != cb.second.indices[i]) return cb;
+	CellNode(Cell<D> o): original(o), previous_dominater(), dominater(o)
+	{
+	}
+
+	__host__ __device__
+
+	CellNode()
+	{
+	}
+};
+
+// make the dominater of key cells be theirselves
+template <int D>
+struct CellComparer
+{
+	int _p;
+
+	CellComparer<D>(int p) : _p(p)
+	{
+	}
+
+	__host__ __device__
+
+	CellNode<D> operator()(CellNode<D>& ca, CellNode<D>& cb)
+	{
+		for (int i = _p + 2; i < D; ++i)
+		{
+			if (ca.dominater[i] != cb.dominater[i]) return cb;
 		}
-		if (ca.second.indices[0] <= cb.second.indices[0] && ca.second.indices[1] <= cb.second.indices[1] && ca.second.isFilled) {
-			cb.second = ca.second;
-			return cb;
+		for (int i = 0; i < _p; ++i)
+		{
+			if (ca.dominater[i] != cb.dominater[i]) return cb;
 		}
-		if (ca.second.isFilled && !cb.second.isFilled) {
-			cb.second = ca.second;
-			return cb;
+		if (ca.dominater[_p] <= cb.dominater[_p] && ca.dominater[_p + 1] <= cb.dominater[_p + 1] && ca.dominater.isFilled)
+		{
+			cb.dominater = ca.dominater;
+		}
+		else if (ca.dominater.isFilled && !cb.dominater.isFilled)
+		{
+			cb.dominater = ca.dominater;
 		}
 		return cb;
 	}
 };
 
+//make the previous_dominater be correct
 template <int D>
-struct CellPermutation {
-	int _p;
-	CellPermutation<D>(int p) : _p(p) {}
+struct CellComparer2
+{
 	__host__ __device__
 
-	bool operator()(t_pair<D>& l, t_pair<D>& r) {
-		for (int i = _p; i < D; ++i) {
-			if (l.first.indices[i] < r.first.indices[i]) return true;
-			if (l.first.indices[i] > r.first.indices[i]) return false;
+	CellNode<D> operator()(CellNode<D>& ca, CellNode<D>& cb)
+	{
+		for (int i = 0; i < D; ++i)
+		{
+			if (cb.original[i] != cb.dominater[i])
+				return cb;
 		}
-		for (int i = 0; i < _p; ++i) {
-			if (l.first.indices[i] < r.first.indices[i]) return true;
-			if (l.first.indices[i] > r.first.indices[i]) return false;
+		if (ca.dominater.isFilled)
+			cb.previous_dominater = ca.dominater;
+
+		return cb;
+	}
+};
+
+//make dominater be correct (some be changed to their previous dominator)
+template <int D>
+struct CellComparer3
+{
+	__host__ __device__
+
+	CellNode<D> operator()(CellNode<D>& ca, CellNode<D>& cb)
+	{
+		for (int i = 0; i < D; ++i)
+		{
+			if (cb.dominater[i] != ca.dominater[i])
+				return cb;
+		}
+		cb.previous_dominater = ca.previous_dominater;
+		return cb;
+	}
+};
+
+template <int D>
+struct CellPermutation
+{
+	int _p;
+
+	CellPermutation<D>(int p) : _p(p)
+	{
+	}
+
+	__host__ __device__
+
+	bool operator()(CellNode<D>& l, CellNode<D>& r)
+	{
+		for (int i = _p; i < D; ++i)
+		{
+			if (l.original[i] < r.original[i]) return true;
+			if (l.original[i] > r.original[i]) return false;
+		}
+		for (int i = 0; i < _p; ++i)
+		{
+			if (l.original[i] < r.original[i]) return true;
+			if (l.original[i] > r.original[i]) return false;
 		}
 		return false;
 	}
 };
 
 template <int D>
-struct Dominater {
+struct Dominater
+{
 	__host__ __device__
 
-	bool operator()(const t_pair<D>& ca) {
-		for (int i = 0; i < D; ++i) {
-			if (ca.first.indices[i] == ca.second.indices[i]) {
+	bool operator()(const CellNode<D>& p)
+	{
+		if (!p.dominater.isFilled)
+			return false;
+
+		for (int i = 0; i < D; ++i)
+		{
+			if (p.original.indices[i] == p.dominater.indices[i])
+			{
 				return true;
 			}
 		}
 		return false;
+	}
+};
+
+template <int D>
+struct Cleaner
+{
+	int _p;
+	__host__ __device__
+		Cleaner<D>(int p) :_p(p) {}
+
+	__host__ __device__
+
+	CellNode<D> operator()(CellNode<D>& p)
+	{
+		if (p.previous_dominater.isFilled == false)
+			return p;
+
+		for (int i = _p; i < _p + 1; ++i)
+		{
+			if (p.previous_dominater[i] >= p.original[i])
+				return p;
+		}
+		p.dominater = p.previous_dominater;
+		return p;
 	}
 };

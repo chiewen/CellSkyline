@@ -10,11 +10,13 @@ using namespace std;
 const int DataSet::kWidth;
 const int DataSet::kMaxLayer;
 
-DataSet::DataSet(int num): kDataPointNum(num) {
+DataSet::DataSet(int num): kDataPointNum(num)
+{
 	init_data_points();
 }
 
-void DataSet::init_data_points() {
+void DataSet::init_data_points()
+{
 	std::generate_n(back_inserter(data_points), kDataPointNum, []()-> DataPoint
 	{
 		return {rand() % kWidth, rand() % kWidth};
@@ -32,7 +34,8 @@ void DataSet::init_data_points() {
 	fill_n(p6[0][0], 1 << 13, 0);
 }
 
-void DataSet::sort_data_points(const int layer) {
+void DataSet::sort_data_points(const int layer)
+{
 	const auto width = kWidth >> layer;
 
 	sort(data_points.begin(), data_points.end(), [=](const DataPoint& p1, const DataPoint& p2)-> bool
@@ -50,22 +53,28 @@ void DataSet::sort_data_points(const int layer) {
 }
 
 template <class T1, class T2>
-void DataSet::fill_empty_cells(T1& t1, T2& t2, int max) {
-	for (int i = 0; i < max; ++i) {
-		for (int j = 0; j < max; ++j) {
+void DataSet::fill_empty_cells(T1& t1, T2& t2, int max)
+{
+	for (int i = 0; i < max; ++i)
+	{
+		for (int j = 0; j < max; ++j)
+		{
 			if (t1[i][j]) t2[i / 2][j / 2] = true;
 		}
 	}
 }
 
-void DataSet::prepare_cells() {
+void DataSet::prepare_cells()
+{
 	const auto width = kWidth >> kMaxLayer;
 
 	// layer 6 and points 6
 	int i = 0;
-	for (auto& p : data_points) {
+	for (auto& p : data_points)
+	{
 		t6[p.y / width][p.x / width] = true;
-		if (p6[p.y / width][p.x / width][0] == 0) {
+		if (p6[p.y / width][p.x / width][0] == 0)
+		{
 			p6[p.y / width][p.x / width][0] = i;
 		}
 		p6[p.y / width][p.x / width][1] = i + 1;
@@ -81,17 +90,22 @@ void DataSet::prepare_cells() {
 }
 
 template <class T>
-void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<KeyCell<2>>& kc_b, int ce_max, T& t) {
+void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<KeyCell<2>>& kc_b, int ce_max, T& t)
+{
 	Iterator<1> iter{0};
 	int cs = kc_a[0].get_last();
 	int ce = ce_max;
 
-	for (unsigned short k = 1; k < kc_a.size(); k++) {
+	for (unsigned short k = 1; k < kc_a.size(); k++)
+	{
 		auto& key_cell = kc_a[k];
 		Iterator<1> iter_next = key_cell.get_I();
-		for (unsigned short i = iter[0] * 2; i < iter_next[0] * 2; ++i) {
-			for (unsigned short j = cs; j < ce; ++j) {
-				if (t[i][j]) {
+		for (unsigned short i = iter[0] * 2; i < iter_next[0] * 2; ++i)
+		{
+			for (unsigned short j = cs; j < ce; ++j)
+			{
+				if (t[i][j])
+				{
 					kc_b.push_back(KeyCell<2>{i, j});
 					ce = j;
 					break;
@@ -101,36 +115,43 @@ void DataSet::shrink_candidates_serial(const vector<KeyCell<2>>& kc_a, vector<Ke
 		iter = iter_next;
 		cs = key_cell.get_last() * 2;
 	}
-	for (unsigned short i = iter[0] * 2; i < ce_max; ++i) {
-		for (unsigned short j = cs; j < ce; ++j) {
-			if (t[i][j]) {
+	for (unsigned short i = iter[0] * 2; i < ce_max; ++i)
+	{
+		for (unsigned short j = cs; j < ce; ++j)
+		{
+			if (t[i][j])
+			{
 				kc_b.push_back(KeyCell<2>{i, j});
 				ce = j;
 				break;
 			}
 		}
 	}
-
 }
 
 template <class T>
-void DataSet::refine(vector<KeyCell<2>>& kc, vector<DataPoint>& skyline, int ce_max, T& t) {
+void DataSet::refine(vector<KeyCell<2>>& kc, vector<DataPoint>& skyline, int ce_max, T& t)
+{
 	Iterator<1> iter{0};
 	int cs = kc[0].get_last();
 	int ce = ce_max;
 
-	for (unsigned short k = 1; k < kc.size(); k++) {
+	for (unsigned short k = 1; k < kc.size(); k++)
+	{
 		vector<DataPoint> points;
 		auto& key_cell = kc[k];
 		Iterator<1> iter_next = key_cell.get_I();
 
-		for (unsigned short i = iter[0]; i < iter_next[0]; ++i) {
+		for (unsigned short i = iter[0]; i < iter_next[0]; ++i)
+		{
 			if (i > iter[0] + 1)
 				ce = cs + 2;
 
-			for (unsigned short j = cs; j < ce; ++j) {
+			for (unsigned short j = cs; j < ce; ++j)
+			{
 				auto p = t[i][j];
-				for (int l = p[0]; l < p[1]; ++l) {
+				for (int l = p[0]; l < p[1]; ++l)
+				{
 					points.push_back(data_points[l]);
 				}
 			}
@@ -142,16 +163,19 @@ void DataSet::refine(vector<KeyCell<2>>& kc, vector<DataPoint>& skyline, int ce_
 		skyline_points(points, skyline);
 	}
 	vector<DataPoint> points;
-	for (int i = kc[kc.size() - 1].get_I()[0]; i < ce_max; ++i) {
+	for (int i = kc[kc.size() - 1].get_I()[0]; i < ce_max; ++i)
+	{
 		auto p = t[i][0];
-		for (int j = p[0]; j < p[1]; ++j) {
+		for (int j = p[0]; j < p[1]; ++j)
+		{
 			points.push_back(data_points[j]);
 		}
 	}
 	skyline_points(points, skyline);
 }
 
-vector<DataPoint> DataSet::skyline_serial() {
+vector<DataPoint> DataSet::skyline_serial()
+{
 	vector<DataPoint> skyline;
 
 	sort_data_points(kMaxLayer);
@@ -172,7 +196,8 @@ vector<DataPoint> DataSet::skyline_serial() {
 	return skyline;
 }
 
-std::vector<DataPoint> DataSet::skyline_parallel() {
+std::vector<DataPoint> DataSet::skyline_parallel()
+{
 	vector<DataPoint> skyline;
 
 	sort_data_points(kMaxLayer);
@@ -191,10 +216,10 @@ std::vector<DataPoint> DataSet::skyline_parallel() {
 	refine(kc_6, skyline, 64, p6);
 
 	return skyline;
-
 }
 
-void DataSet::skyline_points(vector<DataPoint>& points, vector<DataPoint>& result) const {
+void DataSet::skyline_points(vector<DataPoint>& points, vector<DataPoint>& result) const
+{
 	sort(points.begin(), points.end(), [](const DataPoint& p1, const DataPoint& p2)-> bool
 	{
 		return p1.x + p1.y < p2.x + p2.y;
@@ -206,7 +231,8 @@ void DataSet::skyline_points(vector<DataPoint>& points, vector<DataPoint>& resul
 		if (!count_if(skyline.begin(), skyline.end(), [&point](DataPoint& p_s) -> bool
 		{
 			return p_s.x <= point.x && p_s.y <= point.y;
-		})) {
+		}))
+		{
 			skyline.push_back(point);
 		}
 	});
