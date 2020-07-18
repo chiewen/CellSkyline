@@ -77,13 +77,19 @@ std::vector<Cell<D>> ParallelShrinker::process(std::vector<Cell<D>> cells) const
 		return CellNode<D>(cell);
 	});
 
+	std::vector<CellNode<D>> h_cells(cells.size());
 	for (int i = 0; i < D - 1; ++i)
 	{
-		thrust::sort(d_nodes.begin(), d_nodes.end(), CellPermutation<D>(i));
+		thrust::sort(d_nodes.begin(), d_nodes.end(), CellPermutation<D>((i + 2) % D));
+		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 		thrust::inclusive_scan(d_nodes.begin(), d_nodes.end(), d_nodes.begin(), CellComparer<D>(i));
+		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 		thrust::inclusive_scan(d_nodes.begin(), d_nodes.end(), d_nodes.begin(), CellComparer2<D>());
+		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 		thrust::inclusive_scan(d_nodes.begin(), d_nodes.end(), d_nodes.begin(), CellComparer3<D>());
+		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 		thrust::transform(d_nodes.begin(), d_nodes.end(), d_nodes.begin(), Cleaner<D>(i));
+		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 	}
 	auto e = thrust::copy_if(d_nodes.begin(), d_nodes.end(), d_result_nodes.begin(), Dominater<D>());
 

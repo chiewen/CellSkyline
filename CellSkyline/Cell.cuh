@@ -66,7 +66,7 @@ Cell<D>::Cell(std::initializer_list<int> il)
 	{
 		indices[i++] = elem;
 	}
-}
+} 
 
 template <int D>
 Cell<D>::Cell( std::initializer_list<int> il, bool isf) : Cell(il)

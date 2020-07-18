@@ -51,10 +51,10 @@ struct CellComparer
 		{
 			if (ca.dominater[i] != cb.dominater[i]) return cb;
 		}
-		for (int i = 0; i < _p; ++i)
-		{
-			if (ca.dominater[i] != cb.dominater[i]) return cb;
-		}
+		// for (int i = 0; i < _p; ++i)
+		// {
+		// 	if (ca.dominater[i] != cb.dominater[i]) return cb;
+		// }
 		if (ca.dominater[_p] <= cb.dominater[_p] && ca.dominater[_p + 1] <= cb.dominater[_p + 1] && ca.dominater.isFilled)
 		{
 			cb.dominater = ca.dominater;
@@ -167,7 +167,7 @@ struct Cleaner
 		if (p.previous_dominater.isFilled == false)
 			return p;
 
-		for (int i = _p; i < _p + 1; ++i)
+		for (int i = 0; i < D; ++i)
 		{
 			if (p.previous_dominater[i] >= p.original[i])
 				return p;
