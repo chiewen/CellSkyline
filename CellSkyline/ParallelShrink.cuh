@@ -38,10 +38,10 @@ std::vector<Cell<D>> ParallelShrinker::expand_cells2(std::vector<Cell<D>> cells,
 	std::vector<Cell<D>> result;
 	for (auto & cell : cells)
 	{
-		result.emplace_back({ t[2 * cell[0]][2 * cell[1]], 2 * cell[0], 2 * cell[1]});
-		result.emplace_back({ t[2 * cell[0]][2 * cell[1]+1], 2 * cell[0], 2 * cell[1]+1});
-		result.emplace_back({ t[2 * cell[0]+1][2 * cell[1]], 2 * cell[0]+1, 2 * cell[1]});
-		result.emplace_back({ t[2 * cell[0]+1][2 * cell[1]+1], 2 * cell[0]+1, 2 * cell[1]+1});
+		result.emplace_back({ 2 * cell[0], 2 * cell[1]    , t[2 * cell[0]][2 * cell[1]]    });
+		result.emplace_back({ 2 * cell[0], 2 * cell[1]+1  , t[2 * cell[0]][2 * cell[1]+1]   });
+		result.emplace_back({ 2 * cell[0]+1, 2 * cell[1]  , t[2 * cell[0]+1][2 * cell[1]]  });
+		result.emplace_back({ 2 * cell[0]+1, 2 * cell[1]+1, t[2 * cell[0]+1][2 * cell[1]+1]});
 	}
 	return result;
 }
@@ -53,14 +53,14 @@ std::vector<Cell<D>> ParallelShrinker::expand_cells3(std::vector<Cell<D>> cells,
 	std::vector<Cell<D>> result;
 	for (auto & cell : cells)
 	{
-		result.emplace_back(Cell<3>{ t[2 * cell[0]][2 * cell[1]][2 * cell[2]], 2 * cell[0], 2 * cell[1], 2 * cell[2] });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]][2 * cell[1]][2 * cell[2]+1], 2 * cell[0], 2 * cell[1], 2 * cell[2]+1 });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]][2 * cell[1]+1][2 * cell[2]], 2 * cell[0], 2 * cell[1]+1, 2 * cell[2] });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]][2 * cell[1]+1][2 * cell[2]+1], 2 * cell[0], 2 * cell[1]+1, 2 * cell[2]+1 });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]+1][2 * cell[1]][2 * cell[2]], 2 * cell[0]+1, 2 * cell[1], 2 * cell[2] });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]+1][2 * cell[1]][2 * cell[2]+1], 2 * cell[0]+1, 2 * cell[1], 2 * cell[2]+1 });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]+1][2 * cell[1]+1][2 * cell[2]], 2 * cell[0]+1, 2 * cell[1]+1, 2 * cell[2] });
-		result.emplace_back(Cell<3>{ t[2 * cell[0]+1][2 * cell[1]+1][2 * cell[2]+1], 2 * cell[0]+1, 2 * cell[1]+1, 2 * cell[2]+1 });
+		result.emplace_back(Cell<3>{  2 * cell[0], 2 * cell[1], 2 * cell[2], t[2 * cell[0]][2 * cell[1]][2 * cell[2]]});
+		result.emplace_back(Cell<3>{2 * cell[0], 2 * cell[1], 2 * cell[2]+1    , t[1 * cell[0]][2 * cell[1]][2 * cell[2]+1]     });
+		result.emplace_back(Cell<3>{2 * cell[0], 2 * cell[1]+1, 2 * cell[2]    , t[1 * cell[0]][2 * cell[1]+1][2 * cell[2]]     });
+		result.emplace_back(Cell<3>{2 * cell[0], 2 * cell[1]+1, 2 * cell[2]+1  , t[1 * cell[0]][2 * cell[1]+1][2 * cell[2]+1]   });
+		result.emplace_back(Cell<3>{2 * cell[0]+1, 2 * cell[1], 2 * cell[2]    , t[1 * cell[0]+1][2 * cell[1]][2 * cell[2]]     });
+		result.emplace_back(Cell<3>{2 * cell[0]+1, 2 * cell[1], 2 * cell[2]+1  , t[1 * cell[0]+1][2 * cell[1]][2 * cell[2]+1]   });
+		result.emplace_back(Cell<3>{2 * cell[0]+1, 2 * cell[1]+1, 2 * cell[2]  , t[1 * cell[0]+1][2 * cell[1]+1][2 * cell[2]]   });
+		result.emplace_back(Cell<3>{2 * cell[0]+1, 2 * cell[1]+1, 2 * cell[2]+1, t[1 * cell[0]+1][2 * cell[1]+1][2 * cell[2]+1] });
 	}
 
 	return result;
@@ -91,6 +91,7 @@ std::vector<Cell<D>> ParallelShrinker::process(std::vector<Cell<D>> cells) const
 		thrust::transform(d_nodes.begin(), d_nodes.end(), d_nodes.begin(), Cleaner<D>(i));
 		thrust::copy(d_nodes.begin(), d_nodes.end(), h_cells.begin());
 	}
+	thrust::sort(d_nodes.begin(), d_nodes.end(), CellPermutation<D>(0));
 	auto e = thrust::copy_if(d_nodes.begin(), d_nodes.end(), d_result_nodes.begin(), Dominater<D>());
 
 	int i = e - d_result_nodes.begin();

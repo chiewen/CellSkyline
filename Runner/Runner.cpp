@@ -90,23 +90,23 @@ int main()
 	// 		<< "秒" << endl;
 	// }	
 	//
-	// for (auto t : times) {
-	// 	auto start = system_clock::now();
-	// 	DataSet3 ds3(t);
-	// 	DataSet3 ds3_1 = ds3;
-	// 	vector<DataPoint3> skyline;
-	// 	ds3.skyline_points(*ds3.data_points, skyline);
-	// 	auto skyline_1 = ds3_1.skyline_parallel();
-	// 	print_skyline(skyline);
-	// 	print_skyline(skyline_1);
-	// 	auto end = system_clock::now();
-	// 	auto duration = duration_cast<microseconds>(end - start);
-	// 	cout << "并行处理" << t << "个3D点花费了"
-	// 		<< double(duration.count()) * microseconds::period::num / microseconds::period::den
-	// 		<< "秒" << endl;
-	// }	
+	for (auto t : times) {
+		auto start = system_clock::now();
+		DataSet3 ds3(t);
+		DataSet3 ds3_1 = ds3;
+		vector<DataPoint3> skyline;
+		ds3.skyline_points(*ds3.data_points, skyline);
+		auto skyline_1 = ds3_1.skyline_parallel();
+		print_skyline(skyline);
+		print_skyline(skyline_1);
+		auto end = system_clock::now();
+		auto duration = duration_cast<microseconds>(end - start);
+		cout << "并行处理" << t << "个3D点花费了"
+			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+			<< "秒" << endl;
+	}	
 
-	testParallel2();
+	// testParallel2();
 	return 0;
 }
 

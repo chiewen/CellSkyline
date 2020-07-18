@@ -47,15 +47,26 @@ struct CellComparer
 
 	CellNode<D> operator()(CellNode<D>& ca, CellNode<D>& cb)
 	{
+		bool is_dom = true;
+		for (int i = 0; i < D; ++i)
+		{
+			if (ca.dominater[i] >= cb.original[i])
+			{
+				is_dom = false;
+				break;
+			}
+		}
+		if (is_dom)
+		{
+			cb.dominater = ca.dominater;
+			return cb;
+		}
+		
 		for (int i = _p + 2; i < D; ++i)
 		{
 			if (ca.dominater[i] != cb.dominater[i]) return cb;
 		}
-		// for (int i = 0; i < _p; ++i)
-		// {
-		// 	if (ca.dominater[i] != cb.dominater[i]) return cb;
-		// }
-		if (ca.dominater[_p] <= cb.dominater[_p] && ca.dominater[_p + 1] <= cb.dominater[_p + 1] && ca.dominater.isFilled)
+		if (ca.dominater[_p] <= cb.dominater[_p] && ca.dominater[(_p + 1)%D] <= cb.dominater[(_p + 1)%D] && ca.dominater.isFilled)
 		{
 			cb.dominater = ca.dominater;
 		}

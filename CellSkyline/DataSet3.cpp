@@ -14,6 +14,9 @@ DataSet3::DataSet3(int num): kDataPointNum(num), data_points(new vector<DataPoin
                              pp(new int[128][128][128][2]())
 {
 	init_data_points();
+	sort_data_points(kMaxLayer);
+	prepare_cells();
+
 }
 
 void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<DataPointD<3>>& result) const
@@ -53,9 +56,6 @@ std::vector<DataPoint3> DataSet3::skyline_serial()
 {
 	vector<DataPoint3> skyline;
 
-	sort_data_points(kMaxLayer);
-
-	prepare_cells();
 
 	vector<KeyCell<3>> kc_0{{0, 0, 0}}, kc_1, kc_2, kc_3, kc_4, kc_5, kc_6, kc_7;
 
