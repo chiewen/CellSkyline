@@ -88,6 +88,7 @@
     <ClInclude Include="Cell.cuh" />
     <ClInclude Include="DataPoint.h" />
     <ClInclude Include="DataSet.h" />
+    <ClInclude Include="DataSet2.h" />
     <ClInclude Include="DataSet3.h" />
     <ClInclude Include="KeyCell.h" />
     <ClInclude Include="ParallelShrink.cuh" />
@@ -98,6 +99,7 @@
   <ItemGroup>
     <ClCompile Include="DataPoint.cpp" />
     <ClCompile Include="DataSet.cpp" />
+    <ClCompile Include="DataSet2.cpp" />
     <ClCompile Include="DataSet3.cpp" />
     <ClCompile Include="KeyCell.cpp" />
     <ClCompile Include="Timer.cpp" />

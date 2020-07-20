@@ -31,7 +31,7 @@ void DataSet::init_data_points()
 	fill_n(t5[0], 1 << 10, 0);
 	fill_n(t6[0], 1 << 12, 0);
 
-	fill_n(p6[0][0], 1 << 13, 0);
+	fill_n(pp[0][0], 1 << 13, 0);
 }
 
 void DataSet::sort_data_points(const int layer)
@@ -73,11 +73,11 @@ void DataSet::prepare_cells()
 	for (auto& p : data_points)
 	{
 		t6[p.y / width][p.x / width] = true;
-		if (p6[p.y / width][p.x / width][0] == 0)
+		if (pp[p.y / width][p.x / width][0] == 0)
 		{
-			p6[p.y / width][p.x / width][0] = i;
+			pp[p.y / width][p.x / width][0] = i;
 		}
-		p6[p.y / width][p.x / width][1] = i + 1;
+		pp[p.y / width][p.x / width][1] = i + 1;
 
 		i++;
 	}

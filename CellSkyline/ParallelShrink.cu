@@ -2,6 +2,41 @@
 
 #include "Timer.h"
 
+
+std::vector<Cell<2>> ParallelShrinker::shrink_parallel2(DataSet2& data_set2)
+{
+	std::vector<Cell<2>> cells_l0{ {0, 0, false} };
+
+	std::vector<Cell<2>> cells_l1, cells_l2, cells_l3, cells_l4, cells_l5, cells_l6, cells_l7;
+	Timer::start1();
+	if (data_set2.layer >= 1)
+		cells_l1 = process(expand_cells3(cells_l0, data_set2.pt1));
+	if (data_set2.layer >= 2)
+		cells_l2 = process(expand_cells3(cells_l1, data_set2.pt2));
+	if (data_set2.layer >= 3)
+		cells_l3 = process(expand_cells3(cells_l2, data_set2.pt3));
+	if (data_set2.layer >= 4)
+		cells_l4 = process(expand_cells3(cells_l3, data_set2.pt4));
+	if (data_set2.layer >= 5)
+		cells_l5 = process(expand_cells3(cells_l4, data_set2.pt5));
+	if (data_set2.layer >= 6)
+		cells_l6 = process(expand_cells3(cells_l5, data_set2.pt6));
+	if (data_set2.layer >= 7)
+		cells_l7 = process(expand_cells3(cells_l6, data_set2.pt7));
+
+	Timer::stop1();
+	switch (data_set2.layer)
+	{
+	case 1: return cells_l1;
+	case 2: return cells_l2;
+	case 3: return cells_l3;
+	case 4: return cells_l4;
+	case 5: return cells_l5;
+	case 6: return cells_l6;
+	case 7: return cells_l7;
+	}
+	return cells_l0;
+}
 std::vector<Cell<3>> ParallelShrinker::shrink_parallel3(DataSet3& data_set3)
 {
 	std::vector<Cell<3>> cells_l0{ {0, 0, 0, false} };

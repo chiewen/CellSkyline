@@ -45,3 +45,4 @@ DataPointD<D>::DataPointD(std::initializer_list<short> il)
 }
 
 #define DataPoint3 DataPointD<3>
+#define DataPoint2 DataPointD<2>

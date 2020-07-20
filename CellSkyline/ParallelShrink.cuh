@@ -3,6 +3,7 @@
 #include <vector>
 #include "KeyCell.h"
 #include "DataSet3.h"
+#include "DataSet2.h"
 #include <stdio.h>
 #include <cmath>
 #include <ctime>
@@ -21,6 +22,7 @@ struct ParallelShrinker
 {
 
 	std::vector<Cell<3>> shrink_parallel3(DataSet3& ds_set3);
+	std::vector<Cell<2>> shrink_parallel2(DataSet2& ds_set2);
 
 	template <class T, int D>
 	std::vector<Cell<D>> expand_cells2(std::vector<Cell<D>> cells, T& t);

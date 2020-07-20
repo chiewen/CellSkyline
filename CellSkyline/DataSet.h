@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿//deprecated see DataSet2
+#pragma once
 #include "DataPoint.h"
 #include <vector>
 
@@ -12,7 +13,7 @@ public:
 	std::vector<DataPoint> data_points;
 
 	const static int kWidth = 32768; // 2^15
-	const static int kMaxLayer = 6;
+	const static int kMaxLayer = 7;
 
 	DataSet(int num = 50);
 	void skyline_points(std::vector<DataPoint>& points, std::vector<DataPoint>& result) const;
@@ -23,9 +24,9 @@ public:
 	friend int shrink_parallel2(const std::vector<KeyCell<2>>& kc_a, std::vector<KeyCell<2>>& kc_b, int ce_max, T& t);
 
 private:
-	bool t1[2][2]{}, t2[4][4]{}, t3[8][8]{}, t4[16][16]{}, t5[32][32]{}, t6[64][64]{};
-	// , t7[128][128], t8[256][256], t9[512][512], t10[1024][1024];
-	int p6[64][64][2]{};
+	bool t1[2][2]{}, t2[4][4]{}, t3[8][8]{}, t4[16][16]{}, t5[32][32]{}, t6[64][64]{}, t7[128][128];
+	// , t8[256][256], t9[512][512], t10[1024][1024];
+	int pp[128][128][2]{};
 
 	void init_data_points();
 	void prepare_cells();
