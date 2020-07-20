@@ -3,7 +3,7 @@
 
 using namespace std;
 
-DataSet3::DataSet3(int num): kDataPointNum(num), data_points(new vector<DataPoint3>()),
+DataSet3::DataSet3(int num, int layer): kDataPointNum(num), data_points(new vector<DataPoint3>()), layer(layer),
                              pt1(new bool[2][2][2]()),
                              pt2(new bool[4][4][4]()),
                              pt3(new bool[8][8][8]()),
@@ -14,7 +14,6 @@ DataSet3::DataSet3(int num): kDataPointNum(num), data_points(new vector<DataPoin
                              pp(new int[128][128][128][2]())
 {
 	init_data_points();
-	sort_data_points(kMaxLayer);
 	prepare_cells();
 
 }
@@ -43,11 +42,10 @@ void DataSet3::skyline_points(std::vector<DataPointD<3>>& points, std::vector<Da
 std::vector<DataPoint3> DataSet3::skyline_parallel()
 {
 	vector<DataPoint3> skyline;
-	//
 	ParallelShrinker ps;
 	auto cells = ps.shrink_parallel3(*this);
 
-	refine_cell(cells, skyline, 128, pp);
+	refine_cell(cells, skyline, pp);
 
 	return skyline;
 }
@@ -57,22 +55,30 @@ std::vector<DataPoint3> DataSet3::skyline_serial()
 	vector<DataPoint3> skyline;
 
 
-	vector<KeyCell<3>> kc_0{{0, 0, 0}}, kc_1, kc_2, kc_3, kc_4, kc_5, kc_6, kc_7;
+	vector<vector<KeyCell<3>>> kc(8);
+	kc[0] = vector<KeyCell<3>>{ {0, 0, 0 } };
 
-	shrink_candidates_serial(kc_0, kc_1, 2, pt1);
-	shrink_candidates_serial(kc_1, kc_2, 4, pt2);
-	shrink_candidates_serial(kc_2, kc_3, 8, pt3);
-	shrink_candidates_serial(kc_3, kc_4, 16, pt4);
-	shrink_candidates_serial(kc_4, kc_5, 32, pt5);
-	shrink_candidates_serial(kc_5, kc_6, 64, pt6);
-	shrink_candidates_serial(kc_6, kc_7, 128, pt7);
+	if (layer >= 1)
+		shrink_candidates_serial(kc[0], kc[1], 2, pt1);
+	if (layer >= 2)
+		shrink_candidates_serial(kc[1], kc[2], 4, pt2);
+	if (layer >= 3)
+		shrink_candidates_serial(kc[2], kc[3], 8, pt3);
+	if (layer >= 4)
+		shrink_candidates_serial(kc[3], kc[4], 16, pt4);
+	if (layer >= 5)
+		shrink_candidates_serial(kc[4], kc[5], 32, pt5);
+	if (layer >= 6)
+		shrink_candidates_serial(kc[5], kc[6], 64, pt6);
+	if (layer >= 7)
+		shrink_candidates_serial(kc[6], kc[7], 128, pt7);
 
-	refine(kc_7, skyline, 128, pp);
+	refine(kc[layer], skyline, pp);
 
 	return skyline;
 }
 
-void DataSet3::init_data_points() const
+void DataSet3::init_data_points()
 {
 	data_points->reserve(kDataPointNum);
 	std::generate_n(back_inserter(*data_points), kDataPointNum, []()-> DataPoint3
@@ -85,6 +91,8 @@ void DataSet3::init_data_points() const
 	data_points->emplace_back(DataPoint3{0, 0, 32767});
 	data_points->emplace_back(DataPoint3{0, 32767, 0});
 	data_points->emplace_back(DataPoint3{32767, 0, 0});
+
+	sort_data_points(layer);
 
 	fill_n(pt1[0][0], 1 << 3, 0);
 	fill_n(pt2[0][0], 1 << 6, 0);
@@ -105,12 +113,15 @@ void DataSet3::prepare_cells()
 	int i = 0;
 	for (auto& p : *data_points)
 	{
-		pt7[p[0] / width][p[1] / width][p[2] / width] = true;
-		if (pp[p[0] / width][p[1] / width][2] == nullptr)
+		int x = p[0] / width;
+		int y = p[1] / width;
+		int z = p[2] / width;
+		pt7[x][y][z] = true;
+		if (pp[x][y][z][0] == 0)
 		{
-			pp[p[0] / width][p[1] / width][p[2] / width][0] = i;
+			pp[x][y][z][0] = i;
 		}
-		pp[p[0] / width][p[1] / width][p[2] / width][1] = i + 1;
+		pp[x][y][z][1] = i + 1;
 
 		i++;
 	}

@@ -6,6 +6,7 @@
 #include "Cell.cuh"
 #include "DataPoint.h"
 #include "KeyCell.h"
+#include "Timer.h"
 
 class DataSet3
 {
@@ -15,9 +16,10 @@ public:
 
 	const static int kWidth = 32768; // 2^15
 
-	const static int kMaxLayer = 5;
+	const static int kMaxLayer = 7;
+	int layer;
 
-	DataSet3(int num = 5);
+	DataSet3(int num = 5, int layer = 7);
 	void skyline_points(std::vector<DataPoint3>& points, std::vector<DataPoint3>& result) const;
 	std::vector<DataPoint3> skyline_serial();
 	std::vector<DataPoint3> skyline_parallel();
@@ -33,7 +35,7 @@ public:
 	std::shared_ptr<int[128][128][128][2]> pp;
 
 private:
-	void init_data_points() const;
+	void init_data_points();
 	void prepare_cells();
 	void sort_data_points(int layer);
 
@@ -45,9 +47,9 @@ private:
 	                                     T& t);
 
 	template <class T>
-	void refine_cell(std::vector<Cell<3>>& kc, std::vector<DataPoint3>& skyline, int ce_max, T& t);
+	void refine_cell(std::vector<Cell<3>>& kc, std::vector<DataPoint3>& skyline, T& t);
 	template <class T>
-	void refine(std::vector<KeyCell<3>>& kc, std::vector<DataPoint3>& skyline, int ce_max, T& t);
+	void refine(std::vector<KeyCell<3>>& kc, std::vector<DataPoint3>& skyline, T& t);
 };
 
 template <class T1, class T2>
@@ -150,34 +152,54 @@ void DataSet3::shrink_candidates_serial(const std::vector<KeyCell<3>>& kc_a, std
 }
 
 template <class T>
-void DataSet3::refine_cell(std::vector<Cell<3>>& kc, std::vector<DataPointD<3>>& skyline, int ce_max, T& t)
+void DataSet3::refine_cell(std::vector<Cell<3>>& kc, std::vector<DataPointD<3>>& skyline, T& t)
 {
 	Iterator<2> iter{0, 0};
 	std::vector<DataPoint3> points;
-	for (auto& key_cell : kc)
+	for (auto& cell : kc)
 	{
-		auto p = t[key_cell[0]][key_cell[1]][key_cell[2]];
-		for (int i = p[0]; i < p[1]; ++i)
-		{
-			points.push_back((*data_points)[i]);
-		}
+		int m = pow(2, kMaxLayer - layer);
+		for (int i1 = cell[0] * m; i1 < cell[0] * m + m; ++i1)
+			for (int i2 = cell[1] * m; i2 < cell[1] * m + m; ++i2)
+				for (int i3 = cell[2] * m; i3 < cell[2] * m + m; ++i3) {
+					auto p0 = t[i1][i2][i3][0];
+					auto p1 = t[i1][i2][i3][1];
+					for (int i = p0; i < p1; ++i)
+					{
+						points.push_back((*data_points)[i]);
+					}
+				}
 	}
+
+	Timer::start2();
 	skyline_points(points, skyline);
+	Timer::stop2();
 }
 
 
 template <class T>
-void DataSet3::refine(std::vector<KeyCell<3>>& kc, std::vector<DataPointD<3>>& skyline, int ce_max, T& t)
+void DataSet3::refine(std::vector<KeyCell<3>>& kc, std::vector<DataPointD<3>>& skyline, T& t)
 {
 	Iterator<2> iter{0, 0};
 	std::vector<DataPoint3> points;
-	for (auto& key_cell : kc)
+	for (auto& cell : kc)
 	{
-		auto p = t[key_cell[0]][key_cell[1]][key_cell[2]];
-		for (int i = p[0]; i < p[1]; ++i)
-		{
-			points.push_back((*data_points)[i]);
-		}
+		// auto p = t[cell[0]][cell[1]][cell[2]];
+		// for (int i = p[0]; i < p[1]; ++i)
+		// {
+		// 	points.push_back((*data_points)[i]);
+		// }
+		int m = pow(2, kMaxLayer - layer);
+		for (int i1 = cell[0] * m; i1 < cell[0] * m + m; ++i1)
+			for (int i2 = cell[1] * m; i2 < cell[1] * m + m; ++i2)
+				for (int i3 = cell[2] * m; i3 < cell[2] * m + m; ++i3) {
+					auto p0 = t[i1][i2][i3][0];
+					auto p1 = t[i1][i2][i3][1];
+					for (int i = p0; i < p1; ++i)
+					{
+						points.push_back((*data_points)[i]);
+					}
+				}
 	}
 	skyline_points(points, skyline);
 }

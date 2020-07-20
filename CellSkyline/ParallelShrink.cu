@@ -1,19 +1,40 @@
 #include "ParallelShrink.cuh"
 
+#include "Timer.h"
+
 std::vector<Cell<3>> ParallelShrinker::shrink_parallel3(DataSet3& data_set3)
 {
-	std::vector<Cell<3>> cells_l0{{0, 0, 0, false}};
-	//
-	// std::vector<Cell<3>> cells_l1 = process(cells_l0);
-	auto cells_l1 = process(expand_cells3(cells_l0, data_set3.pt1));
-	auto cells_l2 = process(expand_cells3(cells_l1, data_set3.pt2));
-	auto cells_l3 = process(expand_cells3(cells_l2, data_set3.pt3));
-	auto cells_l4 = process(expand_cells3(cells_l3, data_set3.pt4));
-	auto cells_l5 = process(expand_cells3(cells_l4, data_set3.pt5));
-	auto cells_l6 = process(expand_cells3(cells_l5, data_set3.pt6));
-	auto cells_l7 = process(expand_cells3(cells_l6, data_set3.pt7));
-	//
-	return cells_l7;
+	std::vector<Cell<3>> cells_l0{ {0, 0, 0, false} };
+
+	std::vector<Cell<3>> cells_l1, cells_l2, cells_l3, cells_l4, cells_l5, cells_l6, cells_l7;
+	Timer::start1();
+	if (data_set3.layer >= 1)
+		cells_l1 = process(expand_cells3(cells_l0, data_set3.pt1));
+	if (data_set3.layer >= 2)
+		cells_l2 = process(expand_cells3(cells_l1, data_set3.pt2));
+	if (data_set3.layer >= 3)
+		cells_l3 = process(expand_cells3(cells_l2, data_set3.pt3));
+	if (data_set3.layer >= 4)
+		cells_l4 = process(expand_cells3(cells_l3, data_set3.pt4));
+	if (data_set3.layer >= 5)
+		cells_l5 = process(expand_cells3(cells_l4, data_set3.pt5));
+	if (data_set3.layer >= 6)
+		cells_l6 = process(expand_cells3(cells_l5, data_set3.pt6));
+	if (data_set3.layer >= 7)
+		cells_l7 = process(expand_cells3(cells_l6, data_set3.pt7));
+
+	Timer::stop1();
+	switch (data_set3.layer)
+	{
+	case 1: return cells_l1;
+	case 2: return cells_l2;
+	case 3: return cells_l3;
+	case 4: return cells_l4;
+	case 5: return cells_l5;
+	case 6: return cells_l6;
+	case 7: return cells_l7;
+	}
+	return cells_l0;
 }
 
 void testParallel2()

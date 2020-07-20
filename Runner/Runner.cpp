@@ -53,16 +53,55 @@ void print_skyline(vector<DataPointD<3>>& skyline)
 			(p1[0] == p2[0] && p1[1] == p2[1] && p1[2] < p2[2]);
 	});
 
-	std::cout << endl << skyline.size() << ":";
-	copy(skyline.begin(), skyline.end(), std::ostream_iterator<DataPoint3>(std::cout, " "));
+	std::cout << "\nfound:" << skyline.size() << "    \t";
+	// copy(skyline.begin(), skyline.end(), std::ostream_iterator<DataPoint3>(std::cout, " "));
 	
-	cout << endl << "==========================" << endl;
 }
 
+void exp_ds3(int point_num, int layer)
+{
+		srand(3);
+		DataSet3 ds3(point_num, layer);
+		vector<DataPoint3> skyline;
+		auto start = system_clock::now();
+		ds3.skyline_points(*ds3.data_points, skyline);
+		auto end = system_clock::now();
+		auto duration = duration_cast<microseconds>(end - start);
+		print_skyline(skyline);
+		cout << "real >> points: " << point_num << "    \tlayer: " << layer << "    \ttime: "
+			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+			<< endl;
+}
+void exp_ds3_serial(int point_num, int layer)
+{
+		srand(3);
+		DataSet3 ds3(point_num, layer);
+		auto start = system_clock::now();
+		auto skyline = ds3.skyline_serial();
+		auto end = system_clock::now();
+		auto duration = duration_cast<microseconds>(end - start);
+		print_skyline(skyline);
+		cout << "serial >> points: " << point_num << "    \tlayer: " << layer << "    \ttime: "
+			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
+			<< endl;
+}
+void exp_ds3_parallel(int point_num, int layer)
+{
+		srand(3);
+		DataSet3 ds3(point_num, layer);
+		// auto start = system_clock::now();
+		auto skyline = ds3.skyline_parallel();
+		// auto end = system_clock::now();
+		// auto duration = duration_cast<microseconds>(end - start);
+		print_skyline(skyline);
+		cout << "parallel >> points: " << point_num << "    \tlayer: " << layer << "    \ttime: "
+			<< Timer::time1() + Timer::time2() << ":" << Timer::time1() << ":" << Timer::time2()
+			<< endl;
+}
 int main()
 {
-	vector<int> times{ 5000};
-	// vector<int> times{ 5, 50, 500, 5000, 50000};
+	// vector<int> times{5, 50, 500, 5000, 50000, 100000};
+	vector<int> times{50000, 100000, 500000};
 
 	// for (auto t : times) {
 	// 	auto start = system_clock::now();
@@ -91,19 +130,18 @@ int main()
 	// }	
 	//
 	for (auto t : times) {
-		auto start = system_clock::now();
-		DataSet3 ds3(t);
-		DataSet3 ds3_1 = ds3;
-		vector<DataPoint3> skyline;
-		ds3.skyline_points(*ds3.data_points, skyline);
-		auto skyline_1 = ds3_1.skyline_parallel();
-		print_skyline(skyline);
-		print_skyline(skyline_1);
-		auto end = system_clock::now();
-		auto duration = duration_cast<microseconds>(end - start);
-		cout << "并行处理" << t << "个3D点花费了"
-			<< double(duration.count()) * microseconds::period::num / microseconds::period::den
-			<< "秒" << endl;
+		exp_ds3(t, 7);
+		exp_ds3_serial(t, 3);
+		exp_ds3_serial(t, 4);
+		exp_ds3_serial(t, 5);
+		exp_ds3_serial(t, 6);
+		exp_ds3_serial(t, 7);
+		exp_ds3_parallel(t, 3);
+		exp_ds3_parallel(t, 4);
+		exp_ds3_parallel(t, 5);
+		exp_ds3_parallel(t, 6);
+		exp_ds3_parallel(t, 7);
+		cout << endl << "==========================" << endl << flush;
 	}	
 
 	// testParallel2();
